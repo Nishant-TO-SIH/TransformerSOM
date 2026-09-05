@@ -1037,9 +1037,10 @@ int main(int argc, char* argv[]) {
                     if (p % 100000 < 5000) {
                         #pragma omp critical
                         {
-                            double ep_ratio = (double)p / (double)total_tokens;
-                            som.current_radius = std::max(1.0, 3.0 * (1.0 - 0.67 * ep_ratio));
-                            som.current_lr     = std::max(0.05, 0.5 * (1.0 - 0.9 * ep_ratio));
+                            double global_total = (double)total_epochs * (double)total_tokens;
+                            double progress = ((double)(ep - 1) * (double)total_tokens + (double)p) / global_total;
+                            som.current_radius = som.initial_radius * std::pow(som.min_radius / som.initial_radius, progress);
+                            som.current_lr     = som.initial_lr     * std::pow(som.min_lr     / som.initial_lr,     progress);
                             som.rebuild_lut(som.current_radius);
 
                             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
@@ -1087,6 +1088,20 @@ int main(int argc, char* argv[]) {
             std::cout << "  [CHECKPOINT] Saved ternary epoch " << ep << " model to " << ep_ckpt << "\n" << std::flush;
             som.save_checkpoint("ternary_latest.bin");
         }
+
+        // Evaluate sample prompts at end of epoch
+        std::vector<std::string> test_prompts = {
+            "hello how are you",
+            "what is your name",
+            "where are you going",
+            "tell me something good",
+            "who is there"
+        };
+        std::cout << "\n--- Epoch " << ep << " Sample Generations ---\n";
+        for (const auto& p : test_prompts) {
+            std::cout << "  [" << p << "]\n    -> " << evaluate_prompt(som, emb, p) << "\n";
+        }
+        std::cout << "------------------------------------\n\n" << std::flush;
     }
 
     auto total_secs = std::chrono::duration_cast<std::chrono::seconds>(
