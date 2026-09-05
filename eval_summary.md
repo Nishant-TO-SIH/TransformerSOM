@@ -10,3 +10,5 @@
 | 6 | 5/5 | 92 | 74 | 0.804 | `for had and smelly some believe respond ...` |
 | 7 | 5/5 | 96 | 83 | 0.865 | `all a its is the his wanting describe ca...` |
 | 8 | 5/5 | 100 | 81 | 0.81 | `board for a of the as example users them...` |
+| 9 | 5/5 | 96 | 75 | 0.781 | `need code the g page that an outdoor a r...` |
+| 10 | 5/5 | 100 | 75 | 0.75 | `the use and of pair in strong that to wa...` |
